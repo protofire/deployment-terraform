@@ -1,11 +1,13 @@
 **/.DS_Store
-**/.terraform
-terraform.tfstate
-terraform.tfstate.backup
-.terraform.tfstate.lock.info
+
+# Ansible
 *.retry
+**/vpass
+
+# Other
 hosts
 terraform/azure/provision.sh
+*.retry
 playbooks/files/*.pub
 playbooks/group_vars/all
 terraform.tfvars
@@ -13,3 +15,38 @@ terraform/azure/ansible/*
 **/deployment-playbooks/*
 id_rsa
 *.pub
+
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+
+# Ignore any .tfvars files that are generated automatically for each Terraform run. Most
+# .tfvars files are managed as part of configuration and so should be included in
+# version control.
+#
+# example.tfvars
+
+# Ignore override files as they are usually used to override resources locally and so
+# are not checked in
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Include override files you do wish to add to version control using negated pattern
+#
+# !example_override.tf
+
+# Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
+# example: *tfplan*
+
+*terraform.tfvars*
+*terraform.tfplan*
+*.terraform.lock.hcl*
+*.terraform*
