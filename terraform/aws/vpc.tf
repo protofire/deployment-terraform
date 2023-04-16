@@ -36,19 +36,14 @@ data "aws_availability_zones" "this" {
 }
 
 resource "aws_subnet" "subnets" {
-  for_each = toset([for item in var.config.availability_zones :
-    item if contains(
-      data.aws_availability_zones.this.names,
-      "${data.aws_region.this.name}${item}"
-    )
-  ])
+  for_each = toset(local.enabled_availability_zones)
 
   vpc_id            = aws_vpc.this.id
   availability_zone = "${data.aws_region.this.name}${each.value}"
   cidr_block = cidrsubnet(
     var.config.vpc_cidr_block,
     8,
-    index(var.config.availability_zones, each.value)
+    index(local.enabled_availability_zones, each.value)
   )
 
   tags = {

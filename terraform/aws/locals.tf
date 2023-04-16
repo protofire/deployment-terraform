@@ -111,6 +111,10 @@ locals {
       owners             = ["099720109477"]
     }
   }
+  enabled_availability_zones = tolist(setintersection(
+    [for zone in data.aws_availability_zones.this.names : trimprefix(zone, data.aws_region.this.name)],
+    var.config.availability_zones
+  ))
   inframap_security_groups = { for node, node_config in var.config.nodes :
     node => {
       security_groups = merge({ for sg, sg_config in local.default_nodes[node].security_groups :
@@ -199,29 +203,29 @@ locals {
           contains(data.aws_availability_zones.this.names,
             "${data.aws_region.this.name}${var.config.availability_zones[
               (try(
-                var.config.nodes[node].overwrite_specific_node_index_config[index].availability_zone, null) != null ?
+                var.config.nodes["bootnode"].overwrite_specific_node_index_config[2].availability_zone, null) != null ?
                 index(data.aws_availability_zones.this.names, "${data.aws_region.this.name}${
-                  var.config.nodes[node].overwrite_specific_node_index_config[index].availability_zone
-                  }") : (index - 1
+                  var.config.nodes["bootnode"].overwrite_specific_node_index_config[2].availability_zone
+                  }") : (2 - 1
                 )) % (length(data.aws_availability_zones.this.names) > length(var.config.availability_zones) ?
                 length(var.config.availability_zones) : length(data.aws_availability_zones.this.names)
               )
             ]}"
           )
           ?
-          var.config.availability_zones[
+          local.enabled_availability_zones[
             (try(
-              var.config.nodes[node].overwrite_specific_node_index_config[index].availability_zone, null) != null ?
+              var.config.nodes["bootnode"].overwrite_specific_node_index_config[2].availability_zone, null) != null ?
               index(data.aws_availability_zones.this.names, "${data.aws_region.this.name}${
-                var.config.nodes[node].overwrite_specific_node_index_config[index].availability_zone
-                }") : (index - 1
+                var.config.nodes["bootnode"].overwrite_specific_node_index_config[2].availability_zone
+                }") : (2 - 1
               )) % (length(data.aws_availability_zones.this.names) > length(var.config.availability_zones) ?
-              length(var.config.availability_zones) : length(data.aws_availability_zones.this.names)
+              length(local.enabled_availability_zones) : length(data.aws_availability_zones.this.names)
             )
           ]
           :
-          var.config.availability_zones[
-            (index - 1) % length(data.aws_availability_zones.this.names)
+          local.enabled_availability_zones[
+            (2 - 1) % length(data.aws_availability_zones.this.names)
           ]
         }"
         elb = node == "bootnode" ? {

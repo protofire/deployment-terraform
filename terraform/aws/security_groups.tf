@@ -30,13 +30,9 @@ resource "aws_security_group_rule" "sg_rules" {
     local.inframap_elb.bootnode_lb.enabled ? local.inframap_elb : {}) :
     [for sg, sg_config in node_config.security_groups : {
       "${node}_${sg}" = {
-        port     = sg_config.port
-        protocol = sg_config.protocol
-        cidr_blocks = (
-          try(sg_config.source_security_group, null) == null &&
-          can(aws_security_group.sgs[sg_config.source_security_group]) ?
-          sg_config.cidr_blocks : null
-        )
+        port        = sg_config.port
+        protocol    = sg_config.protocol
+        cidr_blocks = sg_config.cidr_blocks
         description = sg
         source_security_group_id = (
           try(sg_config.source_security_group, null) != null &&
